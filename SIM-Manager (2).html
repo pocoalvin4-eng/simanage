@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIM Card Manager</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#161920;--bg3:#1e2230;--bg4:#252a38;
+  --border:#2e3447;--border2:#3d4460;
+  --text:#e8eaf0;--text2:#9ba3bb;--text3:#6b7490;
+  --accent:#4f8ef7;--accent2:#3d7ae8;--accent-bg:rgba(79,142,247,0.12);
+  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.12);
+  --amber:#f5a623;--amber-bg:rgba(245,166,35,0.12);
+  --red:#f5564a;--red-bg:rgba(245,86,74,0.12);
+  --purple:#9b7ff7;--purple-bg:rgba(155,127,247,0.12);
+  --radius:10px;--radius-lg:14px;--radius-xl:18px;
+  --shadow:0 2px 12px rgba(0,0,0,0.4);
+  --font:'DM Sans',system-ui,sans-serif;
+}
+.light{
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#eef0f7;--bg4:#e4e8f2;
+  --border:#d4d9ec;--border2:#b8bfd6;
+  --text:#1a1d2e;--text2:#4a5068;--text3:#8892aa;
+  --accent:#3d7ae8;--accent2:#2a6ad8;--accent-bg:rgba(61,122,232,0.1);
+  --green:#1fa86c;--green-bg:rgba(31,168,108,0.1);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.1);
+  --red:#dc3545;--red-bg:rgba(220,53,69,0.1);
+  --purple:#7c5fd6;--purple-bg:rgba(124,95,214,0.1);
+  --shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background 0.3s,color 0.3s}
+
+#app{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo-text h1{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.logo-text p{font-size:12px;color:var(--text3);margin-top:1px}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:var(--font)}
+.btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn-danger{background:var(--red-bg);border-color:rgba(245,86,74,0.3);color:var(--red)}
+.btn-danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-green{background:var(--green-bg);border-color:rgba(62,207,142,0.3);color:var(--green)}
+.btn-green:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-sm{padding:5px 10px;font-size:12px;gap:4px;border-radius:6px}
+.btn-icon{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
+
+.nav-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.nav-tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:var(--text2)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;transition:border-color 0.2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);font-weight:600;margin-bottom:6px}
+.stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.stat-accent .stat-value{color:var(--accent)}
+.stat-green .stat-value{color:var(--green)}
+.stat-red .stat-value{color:var(--red)}
+.stat-amber .stat-value{color:var(--amber)}
+
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px;pointer-events:none}
+.search-input{width:100%;padding:8px 12px 8px 36px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;transition:border-color 0.15s}
+.search-input::placeholder{color:var(--text3)}
+.search-input:focus{border-color:var(--accent)}
+select.filter-select{padding:8px 32px 8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:13px;font-family:var(--font);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7490' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.15s}
+select.filter-select:focus{border-color:var(--accent)}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.sim-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-xl);padding:18px;transition:all 0.2s;position:relative;overflow:hidden}
+.sim-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
+.sim-card.active::before{background:linear-gradient(90deg,var(--green),var(--accent))}
+.sim-card.warning::before{background:linear-gradient(90deg,var(--amber),#ff9500)}
+.sim-card.expired::before{background:linear-gradient(90deg,var(--red),#ff6b6b)}
+.sim-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.sim-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.sim-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sim-icon.active{background:var(--green-bg);color:var(--green)}
+.sim-icon.warning{background:var(--amber-bg);color:var(--amber)}
+.sim-icon.expired{background:var(--red-bg);color:var(--red)}
+.sim-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.3px}
+.badge-active{background:var(--green-bg);color:var(--green)}
+.badge-warning{background:var(--amber-bg);color:var(--amber)}
+.badge-expired{background:var(--red-bg);color:var(--red)}
+.sim-number{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--text);letter-spacing:0.5px;margin-bottom:3px}
+.sim-alias{font-size:12px;color:var(--text3);margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.meta-item{background:var(--bg3);border-radius:7px;padding:8px 10px}
+.meta-label{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);font-weight:600;margin-bottom:2px}
+.meta-value{font-size:13px;font-weight:500;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-value.urgent{color:var(--red)}
+.meta-value.soon{color:var(--amber)}
+.sim-actions{display:flex;gap:6px;padding-top:12px;border-top:1px solid var(--border)}
+.operator-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--accent-bg);color:var(--accent)}
+.saldo-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--purple-bg);color:var(--purple);border-radius:20px;font-size:11px;font-weight:600}
+.progress-bar{height:4px;background:var(--bg4);border-radius:2px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.empty-state p{font-size:13px;margin-bottom:20px}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:600;color:var(--text2)}
+.count-badge{background:var(--bg4);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--text3);font-weight:500}
+.view-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.view-btn{padding:6px 10px;background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:16px;transition:all 0.15s}
+.view-btn.active{background:var(--accent-bg);color:var(--accent)}
+
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:11px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);font-weight:600;background:var(--bg3);border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+
+/* BACKUP PAGE */
+.backup-hero{background:linear-gradient(135deg,rgba(79,142,247,0.15),rgba(155,127,247,0.15));border:1px solid rgba(79,142,247,0.25);border-radius:var(--radius-xl);padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.backup-hero-text h2{font-size:17px;font-weight:700;margin-bottom:6px}
+.backup-hero-text p{font-size:13px;color:var(--text2);line-height:1.6}
+.backup-hero-actions{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.backup-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.backup-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.backup-card-title{padding:14px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.backup-card-body{padding:18px}
+.backup-card-body p{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.info-box{padding:12px 14px;border-radius:8px;font-size:12px;line-height:1.6;margin-top:14px}
+.info-box.green{background:var(--green-bg);border:1px solid rgba(62,207,142,0.25);color:var(--green)}
+.info-box.amber{background:var(--amber-bg);border:1px solid rgba(245,166,35,0.25);color:var(--amber)}
+.info-box strong{font-weight:600}
+.guide-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.guide-card-title{padding:14px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:20px}
+.guide-col h4{font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text)}
+.step-list{list-style:none;counter-reset:steps}
+.step-list li{counter-increment:steps;display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);line-height:1.5}
+.step-list li:last-child{border-bottom:none}
+.step-list li::before{content:counter(steps);min-width:22px;height:22px;background:var(--accent-bg);color:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-list code{background:var(--bg3);padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text)}
+.data-info{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12px;color:var(--text3);padding:10px 12px;background:var(--bg3);border-radius:8px}
+
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}
+.modal-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end}
+.confirm-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-xl);width:100%;max-width:360px;padding:28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.confirm-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
+.confirm-icon.red{background:var(--red-bg);color:var(--red)}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}
+.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.confirm-actions{display:flex;gap:8px;justify-content:center}
+
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px}
+.form-label .req{color:var(--red);margin-left:2px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);transition:border-color 0.15s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);background:var(--bg2)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7490' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-error{font-size:11px;color:var(--red);margin-top:4px}
+.form-hint{font-size:11px;color:var(--text3);margin-top:4px}
+
+.toast-container{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;color:#fff;animation:slideIn 0.3s ease;pointer-events:all;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:320px}
+.toast-success{background:#1a7a52}.toast-error{background:#8b2020}.toast-info{background:#1a4fa8}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+.toast.removing{animation:fadeOut 0.3s ease forwards}
+
+@media(max-width:640px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .cards-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .header{flex-direction:column;align-items:flex-start;gap:14px}
+  .backup-cards{grid-template-columns:1fr}
+  .guide-grid{grid-template-columns:1fr}
+  .backup-hero{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">📱</div>
+      <div class="logo-text">
+        <h1>SIM Manager</h1>
+        <p>Kelola kartu SIM kamu</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-icon" id="themeToggle" title="Toggle tema"><i class="ti ti-sun"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()"><i class="ti ti-plus"></i> Tambah SIM</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-tab" id="tab-backup" onclick="showPage('backup')"><i class="ti ti-database-export"></i> Backup & Restore</button>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="pageDashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari nomor, alias, atau device..." oninput="render()">
+      </div>
+      <select class="filter-select" id="filterStatus" onchange="render()">
+        <option value="">Semua Status</option>
+        <option value="active">Aktif</option>
+        <option value="warning">Hampir Expired</option>
+        <option value="expired">Expired</option>
+      </select>
+      <select class="filter-select" id="filterOperator" onchange="render()">
+        <option value="">Semua Operator</option>
+        <option>Telkomsel</option><option>Indosat</option><option>XL</option>
+        <option>Tri</option><option>Smartfren</option><option>Axis</option>
+      </select>
+      <select class="filter-select" id="filterSort" onchange="render()">
+        <option value="expired_asc">Expired Terdekat</option>
+        <option value="expired_desc">Expired Terlama</option>
+        <option value="number">Nomor SIM</option>
+        <option value="device">Device</option>
+        <option value="added">Terbaru Ditambah</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn active" id="viewCard" onclick="setView('card')" title="Kartu"><i class="ti ti-layout-grid"></i></button>
+        <button class="view-btn" id="viewTable" onclick="setView('table')" title="Tabel"><i class="ti ti-table"></i></button>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">Daftar SIM Card</span>
+      <span class="count-badge" id="resultCount">0 SIM</span>
+    </div>
+    <div id="simList"></div>
+  </div>
+
+  <!-- ── BACKUP PAGE ── -->
+  <div id="pageBackup" style="display:none">
+
+    <div class="backup-hero">
+      <div class="backup-hero-text">
+        <h2>💾 Backup & Restore Data</h2>
+        <p>Export data sebelum ganti perangkat. Di HP baru, tinggal import file-nya kembali.</p>
+      </div>
+      <div class="backup-hero-actions">
+        <button class="btn btn-green" style="font-size:14px;padding:10px 18px" onclick="exportData('json')">
+          <i class="ti ti-download"></i> Export JSON
+        </button>
+        <button class="btn" style="font-size:14px;padding:10px 18px" onclick="exportData('csv')">
+          <i class="ti ti-file-text"></i> Export CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="backup-cards">
+      <div class="backup-card">
+        <div class="backup-card-title"><i class="ti ti-download"></i> Export / Backup</div>
+        <div class="backup-card-body">
+          <p>Simpan semua data SIM Card ke file di perangkatmu. Gunakan sebelum ganti HP atau clear browser.</p>
+          <button class="btn btn-green" style="width:100%;justify-content:center" onclick="exportData('json')">
+            <i class="ti ti-file-type-json"></i> Export JSON <span style="opacity:0.7;font-size:11px">(Recommended)</span>
+          </button>
+          <button class="btn" style="width:100%;justify-content:center;margin-top:8px" onclick="exportData('csv')">
+            <i class="ti ti-file-text"></i> Export CSV
+          </button>
+          <div class="info-box green">
+            <strong>💡 Tips:</strong> Setelah export, kirim file ke Google Drive atau WhatsApp ke diri sendiri supaya aman.
+          </div>
+          <div class="data-info">
+            <i class="ti ti-database" style="font-size:16px;color:var(--accent)"></i>
+            <span>Total tersimpan: <strong id="totalCount" style="color:var(--text)">0</strong> SIM Card</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="backup-card">
+        <div class="backup-card-title"><i class="ti ti-upload"></i> Import / Restore</div>
+        <div class="backup-card-body">
+          <p>Pulihkan data dari file backup JSON. Cocok digunakan setelah ganti HP atau browser baru.</p>
+          <label class="btn btn-primary" style="width:100%;justify-content:center;cursor:pointer">
+            <i class="ti ti-upload"></i> Pilih File JSON untuk Import
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+          </label>
+          <div class="info-box amber">
+            <strong>⚠️ Info:</strong> Nomor SIM yang sudah ada tidak akan ditimpa. Hanya data baru yang ditambahkan.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="guide-card-title"><i class="ti ti-device-mobile-share"></i> Panduan Ganti Perangkat</div>
+      <div class="guide-grid">
+        <div class="guide-col">
+          <h4>📤 Di HP / Browser Lama</h4>
+          <ol class="step-list">
+            <li>Buka tab <strong>Backup & Restore</strong></li>
+            <li>Klik tombol <strong>Export JSON</strong></li>
+            <li>File <code>simcards.json</code> akan terunduh otomatis</li>
+            <li>Kirim file ke Google Drive, WhatsApp, atau email ke diri sendiri</li>
+          </ol>
+        </div>
+        <div class="guide-col">
+          <h4>📥 Di HP / Browser Baru</h4>
+          <ol class="step-list">
+            <li>Salin file <code>SIM-Manager.html</code> ke HP baru</li>
+            <li>Buka file di browser (Chrome / Firefox)</li>
+            <li>Buka tab <strong>Backup & Restore</strong></li>
+            <li>Klik <strong>Import</strong> → pilih file <code>simcards.json</code> tadi</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Modal Tambah/Edit SIM -->
+<div class="overlay" id="formOverlay" style="display:none" onclick="closeOnOverlay(event,'formOverlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Tambah SIM Card</span>
+      <button class="btn btn-icon" onclick="closeModal('formOverlay')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nomor SIM <span class="req">*</span></label>
+          <input type="tel" class="form-input" id="f_number" placeholder="08xxxxxxxxxx" maxlength="15">
+          <div class="form-error" id="err_number"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alias / Nama</label>
+          <input type="text" class="form-input" id="f_alias" placeholder="cth: SIM Kantor">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Operator <span class="req">*</span></label>
+          <select class="form-select" id="f_operator">
+            <option value="">Pilih Operator</option>
+            <option>Telkomsel</option><option>Indosat</option><option>XL</option>
+            <option>Tri</option><option>Smartfren</option><option>Axis</option><option>Lainnya</option>
+          </select>
+          <div class="form-error" id="err_operator"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Device / Perangkat</label>
+          <input type="text" class="form-input" id="f_device" placeholder="cth: Samsung A54">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Tanggal Expired <span class="req">*</span></label>
+          <input type="date" class="form-input" id="f_expired">
+          <div class="form-error" id="err_expired"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Saldo Pulsa</label>
+          <input type="number" class="form-input" id="f_saldo" placeholder="0" min="0">
+          <div class="form-hint">Dalam Rupiah</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <textarea class="form-textarea" id="f_notes" placeholder="Catatan tambahan tentang SIM ini..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('formOverlay')">Batal</button>
+      <button class="btn btn-primary" onclick="saveSIM()"><i class="ti ti-device-floppy"></i> Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="overlay" id="confirmOverlay" style="display:none" onclick="closeOnOverlay(event,'confirmOverlay')">
+  <div class="confirm-modal" onclick="event.stopPropagation()">
+    <div class="confirm-icon red"><i class="ti ti-trash"></i></div>
+    <div class="confirm-title">Hapus SIM Card?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-actions">
+      <button class="btn" onclick="closeModal('confirmOverlay')">Batal</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn"><i class="ti ti-trash"></i> Hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY='simcards_v2';
+const THEME_KEY='simcard_theme';
+let simCards=[];
+let editingId=null;
+let currentView='card';
+
+function loadData(){
+  try{const r=localStorage.getItem(STORAGE_KEY);simCards=r?JSON.parse(r):getSampleData();}
+  catch(e){simCards=getSampleData();}
+}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(simCards));}
+function getSampleData(){
+  const d=days=>{const x=new Date();x.setDate(x.getDate()+days);return x.toISOString().split('T')[0]};
+  return[
+    {id:'1',number:'081234567890',alias:'SIM Utama',operator:'Telkomsel',device:'Samsung A54',expired:d(120),saldo:50000,notes:'Untuk WhatsApp dan call',added:Date.now()-86400000*5},
+    {id:'2',number:'085678901234',alias:'SIM Kerja',operator:'Indosat',device:'iPhone 13',expired:d(15),saldo:25000,notes:'',added:Date.now()-86400000*10},
+    {id:'3',number:'087890123456',alias:'',operator:'XL',device:'Redmi Note 12',expired:d(-5),saldo:0,notes:'Sudah expired, perlu diperpanjang',added:Date.now()-86400000*30},
+    {id:'4',number:'089012345678',alias:'Backup',operator:'Tri',device:'',expired:d(45),saldo:10000,notes:'',added:Date.now()-86400000*2},
+  ];
+}
+
+function showPage(p){
+  document.getElementById('pageDashboard').style.display=p==='dashboard'?'block':'none';
+  document.getElementById('pageBackup').style.display=p==='backup'?'block':'none';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+p).classList.add('active');
+  if(p==='backup'){const el=document.getElementById('totalCount');if(el)el.textContent=simCards.length;}
+}
+
+function getStatus(expired){
+  const today=new Date();today.setHours(0,0,0,0);
+  const exp=new Date(expired);exp.setHours(0,0,0,0);
+  const diff=Math.floor((exp-today)/(1000*60*60*24));
+  if(diff<0)return'expired';if(diff<=30)return'warning';return'active';
+}
+function getDaysLeft(expired){
+  const today=new Date();today.setHours(0,0,0,0);
+  const exp=new Date(expired);exp.setHours(0,0,0,0);
+  return Math.floor((exp-today)/(1000*60*60*24));
+}
+function formatDate(d){if(!d)return'-';return new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});}
+function formatSaldo(s){if(!s||s==0)return'-';return'Rp '+parseInt(s).toLocaleString('id-ID');}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function renderStats(){
+  const total=simCards.length,
+    active=simCards.filter(s=>getStatus(s.expired)==='active').length,
+    warning=simCards.filter(s=>getStatus(s.expired)==='warning').length,
+    expired=simCards.filter(s=>getStatus(s.expired)==='expired').length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card stat-accent"><div class="stat-label">Total SIM</div><div class="stat-value">${total}</div><div class="stat-sub">Semua kartu</div></div>
+    <div class="stat-card stat-green"><div class="stat-label">Aktif</div><div class="stat-value">${active}</div><div class="stat-sub">Lebih dari 30 hari</div></div>
+    <div class="stat-card stat-amber"><div class="stat-label">Hampir Expired</div><div class="stat-value">${warning}</div><div class="stat-sub">Dalam 30 hari</div></div>
+    <div class="stat-card stat-red"><div class="stat-label">Expired</div><div class="stat-value">${expired}</div><div class="stat-sub">Sudah lewat</div></div>`;
+}
+
+function getFiltered(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const fS=document.getElementById('filterStatus').value;
+  const fO=document.getElementById('filterOperator').value;
+  const fSort=document.getElementById('filterSort').value;
+  let list=simCards.filter(s=>{
+    const st=getStatus(s.expired);
+    return(!q||s.number.includes(q)||(s.alias||'').toLowerCase().includes(q)||(s.device||'').toLowerCase().includes(q))
+      &&(!fS||st===fS)&&(!fO||s.operator===fO);
+  });
+  list.sort((a,b)=>{
+    if(fSort==='expired_asc')return new Date(a.expired)-new Date(b.expired);
+    if(fSort==='expired_desc')return new Date(b.expired)-new Date(a.expired);
+    if(fSort==='number')return a.number.localeCompare(b.number);
+    if(fSort==='device')return(a.device||'').localeCompare(b.device||'');
+    return(b.added||0)-(a.added||0);
+  });
+  return list;
+}
+
+function render(){
+  renderStats();
+  const list=getFiltered();
+  document.getElementById('resultCount').textContent=list.length+' SIM';
+  const c=document.getElementById('simList');
+  if(!list.length){
+    c.innerHTML=`<div class="empty-state"><div class="empty-icon"><i class="ti ti-sim-card"></i></div><h3>${simCards.length?'Tidak ada SIM yang cocok':'Belum ada SIM Card'}</h3><p>${simCards.length?'Coba ubah filter pencarian':'Mulai dengan menambahkan SIM Card pertama kamu'}</p>${!simCards.length?'<button class="btn btn-primary" onclick="openAddModal()"><i class="ti ti-plus"></i> Tambah SIM Pertama</button>':''}</div>`;
+    return;
+  }
+  c.innerHTML=currentView==='card'?`<div class="cards-grid">${list.map(cardHTML).join('')}</div>`:tableHTML(list);
+}
+
+function cardHTML(s){
+  const st=getStatus(s.expired),days=getDaysLeft(s.expired);
+  const daysText=days<0?`Expired ${Math.abs(days)} hari lalu`:days===0?'Expired hari ini!':`${days} hari lagi`;
+  const daysClass=st==='expired'?'urgent':st==='warning'?'soon':'';
+  const bClass=st==='active'?'badge-active':st==='warning'?'badge-warning':'badge-expired';
+  const bText=st==='active'?'Aktif':st==='warning'?'Segera':'Expired';
+  const barPct=Math.max(0,Math.min(100,(days/365)*100));
+  const barColor=st==='active'?'var(--green)':st==='warning'?'var(--amber)':'var(--red)';
+  const num=s.number.replace(/(\d{4})(\d{4})(\d+)/,'$1-$2-$3');
+  return`<div class="sim-card ${st}">
+    <div class="sim-card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="sim-icon ${st}"><i class="ti ti-sim-card"></i></div>
+        <span class="operator-badge">${s.operator||'—'}</span>
+      </div>
+      <span class="sim-badge ${bClass}">${bText}</span>
+    </div>
+    <div class="sim-number">${num}</div>
+    <div class="sim-alias">${s.alias||'<span style="color:var(--text3);font-style:italic">Tidak ada alias</span>'}</div>
+    <div class="sim-meta">
+      <div class="meta-item"><div class="meta-label">Device</div><div class="meta-value">${s.device||'—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Expired</div><div class="meta-value ${daysClass}">${daysText}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:11px;color:var(--text3)">${formatDate(s.expired)}</span>
+      ${s.saldo>0?`<span class="saldo-pill"><i class="ti ti-currency" style="font-size:12px"></i>${formatSaldo(s.saldo)}</span>`:''}
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${barPct}%;background:${barColor}"></div></div>
+    ${s.notes?`<div style="margin-top:12px;font-size:12px;color:var(--text3);background:var(--bg3);padding:8px 10px;border-radius:7px;line-height:1.5"><i class="ti ti-notes" style="font-size:13px;margin-right:4px"></i>${s.notes}</div>`:''}
+    <div class="sim-actions">
+      <button class="btn btn-sm" onclick="copyNum('${s.number}')"><i class="ti ti-copy"></i></button>
+      <button class="btn btn-sm" onclick="openEditModal('${s.id}')"><i class="ti ti-edit"></i> Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="confirmDelete('${s.id}')"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>`;
+}
+
+function tableHTML(list){
+  const rows=list.map(s=>{
+    const st=getStatus(s.expired),days=getDaysLeft(s.expired);
+    const daysText=days<0?`${Math.abs(days)}h lalu`:`${days}h lagi`;
+    const bClass=st==='active'?'badge-active':st==='warning'?'badge-warning':'badge-expired';
+    const bText=st==='active'?'Aktif':st==='warning'?'Segera':'Expired';
+    const num=s.number.replace(/(\d{4})(\d{4})(\d+)/,'$1-$2-$3');
+    return`<tr>
+      <td><span class="sim-badge ${bClass}">${bText}</span></td>
+      <td><span style="font-family:'DM Mono',monospace">${num}</span></td>
+      <td>${s.alias||'<span style="color:var(--text3)">—</span>'}</td>
+      <td><span class="operator-badge" style="font-size:11px">${s.operator||'—'}</span></td>
+      <td style="color:var(--text3)">${s.device||'—'}</td>
+      <td style="color:${st==='expired'?'var(--red)':st==='warning'?'var(--amber)':'var(--text2)'}">${formatDate(s.expired)}<br><span style="font-size:11px;opacity:0.7">${daysText}</span></td>
+      <td style="color:var(--purple);font-size:12px">${s.saldo>0?formatSaldo(s.saldo):'—'}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-sm btn-icon" onclick="copyNum('${s.number}')"><i class="ti ti-copy"></i></button>
+        <button class="btn btn-sm btn-icon" onclick="openEditModal('${s.id}')"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-sm btn-icon btn-danger" onclick="confirmDelete('${s.id}')"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  return`<div class="table-wrap"><table><thead><tr><th>Status</th><th>Nomor SIM</th><th>Alias</th><th>Operator</th><th>Device</th><th>Expired</th><th>Saldo</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function setView(v){currentView=v;document.getElementById('viewCard').classList.toggle('active',v==='card');document.getElementById('viewTable').classList.toggle('active',v==='table');render();}
+
+function openAddModal(){editingId=null;document.getElementById('modalTitle').textContent='Tambah SIM Card';clearForm();clearErrors();document.getElementById('formOverlay').style.display='flex';}
+function openEditModal(id){
+  const s=simCards.find(x=>x.id===id);if(!s)return;editingId=id;
+  document.getElementById('modalTitle').textContent='Edit SIM Card';
+  document.getElementById('f_number').value=s.number;document.getElementById('f_alias').value=s.alias||'';
+  document.getElementById('f_operator').value=s.operator||'';document.getElementById('f_device').value=s.device||'';
+  document.getElementById('f_expired').value=s.expired;document.getElementById('f_saldo').value=s.saldo||'';
+  document.getElementById('f_notes').value=s.notes||'';clearErrors();
+  document.getElementById('formOverlay').style.display='flex';
+}
+function clearForm(){['f_number','f_alias','f_device','f_saldo','f_notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('f_operator').value='';document.getElementById('f_expired').value='';}
+function clearErrors(){['err_number','err_operator','err_expired'].forEach(id=>document.getElementById(id).textContent='');}
+
+function saveSIM(){
+  clearErrors();
+  const number=document.getElementById('f_number').value.trim();
+  const alias=document.getElementById('f_alias').value.trim();
+  const operator=document.getElementById('f_operator').value;
+  const device=document.getElementById('f_device').value.trim();
+  const expired=document.getElementById('f_expired').value;
+  const saldo=parseInt(document.getElementById('f_saldo').value)||0;
+  const notes=document.getElementById('f_notes').value.trim();
+  let valid=true;
+  if(!number||!/^0\d{8,14}$/.test(number)){document.getElementById('err_number').textContent='Nomor tidak valid (mulai 0, 9-15 digit)';valid=false;}
+  else if(simCards.some(s=>s.number===number&&s.id!==editingId)){document.getElementById('err_number').textContent='Nomor sudah terdaftar';valid=false;}
+  if(!operator){document.getElementById('err_operator').textContent='Pilih operator';valid=false;}
+  if(!expired){document.getElementById('err_expired').textContent='Pilih tanggal expired';valid=false;}
+  if(!valid)return;
+  if(editingId){const idx=simCards.findIndex(s=>s.id===editingId);simCards[idx]={...simCards[idx],number,alias,operator,device,expired,saldo,notes};showToast('SIM berhasil diperbarui','success');}
+  else{simCards.unshift({id:genId(),number,alias,operator,device,expired,saldo,notes,added:Date.now()});showToast('SIM berhasil ditambahkan','success');}
+  saveData();closeModal('formOverlay');render();
+}
+
+let deleteTarget=null;
+function confirmDelete(id){
+  const s=simCards.find(x=>x.id===id);if(!s)return;deleteTarget=id;
+  const num=s.number.replace(/(\d{4})(\d{4})(\d+)/,'$1-$2-$3');
+  document.getElementById('confirmMsg').innerHTML=`Hapus SIM <strong>${num}</strong>${s.alias?' ('+s.alias+')':''}? Tidak bisa dibatalkan.`;
+  document.getElementById('confirmDeleteBtn').onclick=()=>deleteSIM();
+  document.getElementById('confirmOverlay').style.display='flex';
+}
+function deleteSIM(){simCards=simCards.filter(s=>s.id!==deleteTarget);saveData();closeModal('confirmOverlay');render();showToast('SIM dihapus','error');}
+
+function exportData(fmt){
+  if(fmt==='json'){
+    const blob=new Blob([JSON.stringify(simCards,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='simcards.json';a.click();
+    showToast('Export berhasil! Simpan file ini dengan aman 🗂️','success');
+  } else {
+    const headers=['id','number','alias','operator','device','expired','saldo','notes'];
+    const rows=simCards.map(s=>headers.map(h=>`"${(s[h]||'').toString().replace(/"/g,'""')}"`).join(','));
+    const blob=new Blob([[headers.join(','),...rows].join('\n')],{type:'text/csv'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='simcards.csv';a.click();
+    showToast('Export CSV berhasil!','success');
+  }
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data))throw new Error();
+      const newOnes=data.filter(d=>!simCards.some(s=>s.number===d.number));
+      simCards=[...newOnes,...simCards];
+      saveData();render();
+      showToast(`Import berhasil! ${newOnes.length} SIM ditambahkan${data.length-newOnes.length>0?' ('+( data.length-newOnes.length)+' duplikat dilewati)':''}` ,'success');
+      const el=document.getElementById('totalCount');if(el)el.textContent=simCards.length;
+    }catch(err){showToast('Format file tidak valid','error');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function copyNum(num){
+  navigator.clipboard.writeText(num).then(()=>showToast('Nomor disalin: '+num,'info')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=num;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Nomor disalin','info');
+  });
+}
+function showToast(msg,type='info'){
+  const c=document.getElementById('toastContainer'),t=document.createElement('div');
+  const icons={success:'ti-check',error:'ti-trash',info:'ti-info-circle'};
+  t.className=`toast toast-${type}`;t.innerHTML=`<i class="ti ${icons[type]||'ti-info-circle'}" style="font-size:16px;flex-shrink:0"></i>${msg}`;
+  c.appendChild(t);setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300)},3200);
+}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function closeOnOverlay(e,id){if(e.target.id===id)closeModal(id);}
+
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  document.getElementById('themeToggle').innerHTML=isLight?'<i class="ti ti-moon"></i>':'<i class="ti ti-sun"></i>';
+  localStorage.setItem(THEME_KEY,isLight?'light':'dark');
+}
+function initTheme(){
+  if(localStorage.getItem(THEME_KEY)==='light'){
+    document.body.classList.add('light');
+    document.getElementById('themeToggle').innerHTML='<i class="ti ti-moon"></i>';
+  }
+}
+document.getElementById('themeToggle').onclick=toggleTheme;
+
+loadData();initTheme();render();
+</script>
+</body>
+</html>
